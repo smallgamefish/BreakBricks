@@ -11,7 +11,12 @@ import (
 
 const (
 	//最大的消息长度，默认是512字节
-	MaxDataSize = 512
+	//1Byte(字节) = 8bit(位)
+	//1KB = 1024Byte(字节)
+	//1MB = 1024KB
+	//1GB = 1024MB
+	//1TB = 1024GB
+	MaxDataSize = 1024 * 1024
 )
 
 func main() {
@@ -33,14 +38,16 @@ func main() {
 	for {
 		//监听连接的用户
 		data := make([]byte, MaxDataSize)
-		_, remoteAddr, err := socket.ReadFromUDP(data)
+		n, remoteAddr, err := socket.ReadFromUDP(data)
 		if err != nil {
 			fmt.Println("读取数据失败!", err)
 			continue
 		}
 
+		//事件解码
+		log.Println("字节数是多少:", n)
 		msg := new(protoc.ClientSendMsg)
-		err = proto.Unmarshal(data, msg)
+		err = proto.Unmarshal(data[:n], msg)
 		if err != nil {
 			//解码失败
 			response := new(protoc.ClientAcceptMsg)

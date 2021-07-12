@@ -14,7 +14,7 @@ type RoomManage struct {
 }
 
 func NewRoomManage(conn *net.UDPConn) *RoomManage {
-	return &RoomManage{conn: conn}
+	return &RoomManage{conn: conn, roomMap: make(map[string]*Room)}
 }
 
 //新建一个房间，成功返回true，失败返回false
