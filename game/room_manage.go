@@ -2,8 +2,13 @@ package game
 
 import (
 	"errors"
+	"fmt"
 	"net"
 	"sync"
+)
+
+const (
+	MaxRoomNumber = 500
 )
 
 //房间管理者
@@ -24,6 +29,10 @@ func (m *RoomManage) AddRoom(roomId string) error {
 
 	if _, ok := m.roomMap[roomId]; ok {
 		return errors.New("房间已经存在")
+	}
+
+	if len(m.roomMap) == MaxRoomNumber {
+		return errors.New(fmt.Sprintf("服务器目前最多只支持%d个房间", MaxRoomNumber))
 	}
 
 	m.roomMap[roomId] = NewRoom(roomId, m.conn)
