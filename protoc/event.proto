@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package break_bricks.protoc;
+
+//golang编译出go文件的package命名空间
+option go_package = "github.com/smallgamefish/BreakBricks/protoc";
+
+
+//创建房间事件
+message CreateRoomEvent {
+  string  createRoomId = 1;  //创建房间的id
+}

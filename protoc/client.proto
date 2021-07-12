@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package break_bricks.protoc;
+
+import "event.proto";
+
+//golang编译出go文件的package命名空间
+option go_package = "github.com/smallgamefish/BreakBricks/protoc";
+
+//客户端发送udp的msg消息格式
+message ClientSendMsg {
+  oneof Event {
+    CreateRoomEvent createRoomEvent = 1;
+  }
+}
+
+//客户端接收udp的msg消息格式
+message ClientAcceptMsg{
+  enum Code {
+    Success = 0;
+    Error = 1;
+  }
+
+  Code code = 1;
+  //code等于error时候的错误信息
+  string error = 2;
+
+  oneof Event {
+    CreateRoomEvent createRoomEvent = 3;
+  }
+}
