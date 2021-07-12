@@ -1,0 +1,23 @@
+
+#描点&和别名*,来实现公共变量
+
+
+version: '3.7'
+services:
+  break_bricks:
+    container_name: break_bricks
+    #指定构建的Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile
+      #工作目录空间
+    working_dir: /go/src/github.com/smallgamefish/BreakBricks
+    volumes:
+      - ./:${services.break_bricks.working_dir}
+    command: /bin/bash -c "go install -v ./ && /go/bin/BreakBricks"
+    #设置环境变量
+    environment:
+      - GIN_MODE=release
+      - GOPROXY=https://mirrors.aliyun.com/goproxy/
+    ports:
+      - "8084:8084"
