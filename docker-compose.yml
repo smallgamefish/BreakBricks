@@ -13,7 +13,7 @@ services:
       #工作目录空间
     working_dir: /go/src/github.com/smallgamefish/BreakBricks
     volumes:
-      - ./:${services.break_bricks.working_dir}
+      - ./:"${services.break_bricks.working_dir}"
     command: /bin/bash -c "go install -v ./ && /go/bin/BreakBricks"
     #设置环境变量
     environment:
