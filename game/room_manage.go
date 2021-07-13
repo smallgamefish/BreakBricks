@@ -115,12 +115,26 @@ func (m *roomManage) BroadcastEvent(roomId string, player *net.UDPAddr, event *p
 		Code: protoc.ClientAcceptMsg_Success,
 		Event: &protoc.ClientAcceptMsg_BroadcastEvent{BroadcastEvent: &protoc.BroadcastEvent{
 			RoomId: roomId,
-			Event: &protoc.BroadcastEvent_ReadyEvent{
-				ReadyEvent: &protoc.ReadyEvent{
-					Player: &protoc.Player{
-						UdpString: roomId,
-					}}},
+			Event:  event.BroadcastEvent.Event,
 		}},
+	}
+
+	//需要特殊处理的事件
+	switch specialEvent := event.BroadcastEvent.Event.(type) {
+	case *protoc.BroadcastEvent_ReadyEvent:
+		//用户的准备事件
+		response.Event = &protoc.ClientAcceptMsg_BroadcastEvent{
+			BroadcastEvent: &protoc.BroadcastEvent{
+				RoomId: roomId,
+				Event: &protoc.BroadcastEvent_ReadyEvent{
+					ReadyEvent: &protoc.ReadyEvent{
+						RoomId: specialEvent.ReadyEvent.GetRoomId(),
+						Ready:  specialEvent.ReadyEvent.GetReady(),
+						Player: &protoc.Player{
+							UdpString: player.String(),
+						},
+					}},
+			}}
 	}
 
 	room.GetBroadcastChan() <- response

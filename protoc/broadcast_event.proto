@@ -7,7 +7,7 @@ import "player.proto";
 //golang编译出go文件的package命名空间
 option go_package = "github.com/smallgamefish/BreakBricks/protoc";
 
-//游戏中的广播事件
+//游戏中的广播事件,前端Event传什么，我就回传什么Event
 message BroadcastEvent {
   string roomId = 1;
   oneof Event{
