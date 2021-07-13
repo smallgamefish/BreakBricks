@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package break_bricks.protoc;
 
+import  "player.proto";
+
 //golang编译出go文件的package命名空间
 option go_package = "github.com/smallgamefish/BreakBricks/protoc";
 
@@ -14,4 +16,9 @@ message CreateRoomEvent {
 //加入房间事件
 message JoinRoomEvent {
   string roomId = 1;  //加入房间的id
+}
+
+//刷新房间的玩家
+message RefreshRoomPlayerEvent {
+  repeated Player Players = 1;
 }

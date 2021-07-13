@@ -89,7 +89,6 @@ func main() {
 				response.Error = err.Error()
 			} else {
 				response.Code = protoc.ClientAcceptMsg_Success
-				response.Event = &protoc.ClientAcceptMsg_JoinRoomEvent{JoinRoomEvent: &protoc.JoinRoomEvent{RoomId: event.JoinRoomEvent.GetRoomId()}}
 			}
 
 			responseData, _ := proto.Marshal(response)

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package break_bricks.protoc;
+
+//golang编译出go文件的package命名空间
+option go_package = "github.com/smallgamefish/BreakBricks/protoc";
+
+//玩家
+message Player {
+  //玩家udp标识
+  string udpString = 1;
+}

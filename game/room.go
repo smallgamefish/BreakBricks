@@ -1,9 +1,9 @@
 package game
 
 import (
+	"github.com/golang/protobuf/proto"
 	"github.com/smallgamefish/BreakBricks/protoc/github.com/smallgamefish/BreakBricks/protoc"
 	"net"
-	"github.com/golang/protobuf/proto"
 )
 
 //游戏状态
@@ -28,8 +28,7 @@ type Room struct {
 	udpAddrMap   map[string]*net.UDPAddr      //加入房间的client
 	closeRoom    chan bool                    //关闭房间，无缓冲通道
 	join         chan *net.UDPAddr            //用户加入房间,  无缓冲，一个一个进入
-	//leave        chan *net.UDPAddr            //用户离开房间
-	broadcast    chan *protoc.ClientAcceptMsg //广播消息,无缓冲，要保证事件的顺序
+	broadcast    chan *protoc.ClientAcceptMsg //广播消息,有缓冲
 }
 
 //创建一个房间
@@ -42,7 +41,7 @@ func NewRoom(id string, conn *net.UDPConn) *Room {
 		udpAddrMap:   make(map[string]*net.UDPAddr),
 		closeRoom:    make(chan bool),
 		join:         make(chan *net.UDPAddr),
-		broadcast:    make(chan *protoc.ClientAcceptMsg),
+		broadcast:    make(chan *protoc.ClientAcceptMsg, 20),
 	}
 }
 
@@ -63,6 +62,21 @@ func (g *Room) GetBroadcastChan() chan<- *protoc.ClientAcceptMsg {
 	return g.broadcast
 }
 
+//获取存活的用户列表
+func (g *Room) GetPlayers() []*protoc.Player {
+	players := make([]*protoc.Player, len(g.udpAddrMap))
+
+	i := 0
+	for udpString, _ := range g.udpAddrMap {
+		player := new(protoc.Player)
+		player.UdpString = udpString
+		players[i] = player
+		i++
+	}
+
+	return players
+}
+
 //运行房间
 func (g *Room) Run() {
 	for {
@@ -72,28 +86,24 @@ func (g *Room) Run() {
 			if g.status == Prepare {
 				//准备中房间可加用户
 				g.udpAddrMap[join.String()] = join
-
 				if len(g.udpAddrMap) == int(g.maxUserTotal) {
 					//加入的刚好满员了则切换状态
 					g.status = Full
 				}
+
+				//服务端主动广播一个刷新房间用户的事件
+				refreshRoomPlayerEventBroadcast := new(protoc.ClientAcceptMsg)
+				refreshRoomPlayerEventBroadcast.Code = protoc.ClientAcceptMsg_Success
+				refreshRoomPlayerEventBroadcast.Event = &protoc.ClientAcceptMsg_RefreshRoomPlayerEvent{RefreshRoomPlayerEvent: &protoc.RefreshRoomPlayerEvent{Players: g.GetPlayers()}}
+
+				g.GetBroadcastChan() <- refreshRoomPlayerEventBroadcast
 			}
-		//case leave := <-g.leave:
-		//	//用户离开房间
-		//	if _, ok := g.udpAddrMap[leave.String()]; ok {
-		//		//删除这个用户
-		//		delete(g.udpAddrMap, leave.String())
-		//		//房间是满员状态的，切换到准备状态
-		//		if g.status == Full {
-		//			g.status = Prepare
-		//		}
-		//	}
 		case data := <-g.broadcast:
 			//广播消息
 			responseData, _ := proto.Marshal(data)
 			for _, udpAddr := range g.udpAddrMap {
-				n, err := g.conn.WriteToUDP(responseData, udpAddr)
-				if err != nil || n == 0 {
+				_, err := g.conn.WriteToUDP(responseData, udpAddr)
+				if err != nil {
 					continue
 				}
 			}
@@ -114,6 +124,5 @@ func (g *Room) Close() {
 
 	g.udpAddrMap = nil
 	close(g.join)
-	//close(g.leave)
 	close(g.broadcast)
 }

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package break_bricks.protoc;
 
-import "event.proto";
+import  "event.proto";
 
 //golang编译出go文件的package命名空间
 option go_package = "github.com/smallgamefish/BreakBricks/protoc";
@@ -29,5 +29,6 @@ message ClientAcceptMsg{
   oneof Event {
     CreateRoomEvent createRoomEvent = 3;
     JoinRoomEvent   joinRoomEvent = 4;
+    RefreshRoomPlayerEvent refreshRoomPlayerEvent = 5;
   }
 }
