@@ -28,7 +28,7 @@ type Room struct {
 	udpAddrMap   map[string]*net.UDPAddr      //加入房间的client
 	closeRoom    chan bool                    //关闭房间，无缓冲通道
 	join         chan *net.UDPAddr            //用户加入房间,  无缓冲，一个一个进入
-	leave        chan *net.UDPAddr            //用户离开房间
+	//leave        chan *net.UDPAddr            //用户离开房间
 	broadcast    chan *protoc.ClientAcceptMsg //广播消息,无缓冲，要保证事件的顺序
 }
 
@@ -78,16 +78,16 @@ func (g *Room) Run() {
 					g.status = Full
 				}
 			}
-		case leave := <-g.leave:
-			//用户离开房间
-			if _, ok := g.udpAddrMap[leave.String()]; ok {
-				//删除这个用户
-				delete(g.udpAddrMap, leave.String())
-				//房间是满员状态的，切换到准备状态
-				if g.status == Full {
-					g.status = Prepare
-				}
-			}
+		//case leave := <-g.leave:
+		//	//用户离开房间
+		//	if _, ok := g.udpAddrMap[leave.String()]; ok {
+		//		//删除这个用户
+		//		delete(g.udpAddrMap, leave.String())
+		//		//房间是满员状态的，切换到准备状态
+		//		if g.status == Full {
+		//			g.status = Prepare
+		//		}
+		//	}
 		case data := <-g.broadcast:
 			//广播消息
 			responseData, _ := proto.Marshal(data)
@@ -114,6 +114,6 @@ func (g *Room) Close() {
 
 	g.udpAddrMap = nil
 	close(g.join)
-	close(g.leave)
+	//close(g.leave)
 	close(g.broadcast)
 }
