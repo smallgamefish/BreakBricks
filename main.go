@@ -80,6 +80,7 @@ func main() {
 			socket.WriteToUDP(responseData, remoteAddr)
 			continue
 		case *protoc.ClientSendMsg_JoinRoomEvent:
+			//加入房间的事件
 			err = roomManage.JoinRoom(event.JoinRoomEvent.GetRoomId(), remoteAddr)
 
 			response := new(protoc.ClientAcceptMsg)
@@ -90,7 +91,7 @@ func main() {
 				response.Code = protoc.ClientAcceptMsg_Success
 				response.Event = &protoc.ClientAcceptMsg_JoinRoomEvent{JoinRoomEvent: &protoc.JoinRoomEvent{RoomId: event.JoinRoomEvent.GetRoomId()}}
 			}
-			
+
 			responseData, _ := proto.Marshal(response)
 			socket.WriteToUDP(responseData, remoteAddr)
 			continue
