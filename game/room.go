@@ -4,6 +4,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/smallgamefish/BreakBricks/protoc/github.com/smallgamefish/BreakBricks/protoc"
 	"net"
+	"time"
 )
 
 //游戏状态
@@ -40,6 +41,7 @@ type Room struct {
 	leave        chan *Player                 //用户离开房间，无缓冲，一个一个离开
 	ready        chan *Player                 //用户准备事件
 	broadcast    chan *protoc.ClientAcceptMsg //广播消息,有缓冲
+	heartbeat    <-chan time.Time             //心跳检测
 }
 
 //创建一个房间
@@ -55,6 +57,7 @@ func NewRoom(id string, conn *net.UDPConn) *Room {
 		leave:        make(chan *Player),
 		ready:        make(chan *Player),
 		broadcast:    make(chan *protoc.ClientAcceptMsg, 20),
+		heartbeat:    time.Tick(15 * time.Second),
 	}
 }
 
@@ -179,6 +182,12 @@ func (g *Room) Run() {
 			//关闭房间
 			g.Close()
 			return
+		case <-g.heartbeat:
+			//心跳检测
+			refreshRoomPlayerEvent := new(protoc.ClientAcceptMsg)
+			refreshRoomPlayerEvent.Code = protoc.ClientAcceptMsg_Success
+			//refreshRoomPlayerEvent.Event = &protoc.ClientAcceptMsg_PingEvent{PingEvent: &protoc.PingEvent{Time}}
+			g.GetBroadcastChan() <-
 		}
 	}
 }

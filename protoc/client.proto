@@ -32,5 +32,6 @@ message ClientAcceptMsg{
     CreateRoomEvent createRoomEvent = 3;    //创建房间事件
     RefreshRoomPlayerEvent refreshRoomPlayerEvent = 4;  //刷新房间用户事件
     StartGameEvent startGameEvent = 5;   //开始游戏事件
+    PingEvent pingEvent = 6;             //心跳事件
   }
 }

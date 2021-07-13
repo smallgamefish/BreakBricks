@@ -38,3 +38,8 @@ message ReadyEvent {
 message StartGameEvent {
   string name = 1;    //展示没有什么用
 }
+
+//ping，心跳事件
+message PingEvent {
+  string time = 1;
+}
