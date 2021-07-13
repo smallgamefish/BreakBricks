@@ -115,21 +115,37 @@ func (g *Room) Run() {
 					g.GetBroadcastChan() <- refreshRoomPlayerEventBroadcast
 				}
 			}
-		case data := <-g.broadcast:
-			//广播消息
-			responseData, _ := proto.Marshal(data)
-			for _, udpAddr := range g.udpAddrMap {
-				_, err := g.conn.WriteToUDP(responseData, udpAddr)
-				if err != nil {
-					//有用户链接断开了
-					g.GetLeaveChan() <- udpAddr
-				}
+
+			if len(g.udpAddrMap) == 0 {
+				//所有用户都断开了,房间失效，关闭房间,释放资源
+				g.Close()
 			}
 
+		case data := <-g.broadcast:
+			//广播消息
+			g.sendMsg(data)
+			//判断一下chan是否有缓冲信息，如果有，消费完它
+			n := len(g.broadcast)
+			for i := 0; i < n; i++ {
+				g.sendMsg(<-g.broadcast)
+			}
+			
 		case <-g.closeRoom:
 			//关闭房间
 			g.Close()
 			return
+		}
+	}
+}
+
+//发送消息给房间内的所有用户
+func (g *Room) sendMsg(event *protoc.ClientAcceptMsg) {
+	responseData, _ := proto.Marshal(event)
+	for _, udpAddr := range g.udpAddrMap {
+		_, err := g.conn.WriteToUDP(responseData, udpAddr)
+		if err != nil {
+			//有用户链接断开了
+			g.GetLeaveChan() <- udpAddr
 		}
 	}
 }
