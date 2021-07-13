@@ -29,7 +29,6 @@ message ClientAcceptMsg{
 
   oneof Event {
     CreateRoomEvent createRoomEvent = 3;
-    JoinRoomEvent   joinRoomEvent = 4;
-    RefreshRoomPlayerEvent refreshRoomPlayerEvent = 5;
+    RefreshRoomPlayerEvent refreshRoomPlayerEvent = 4;
   }
 }
