@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package break_bricks.protoc;
 
-import  "event.proto";
+import  "room_event.proto";
 
 //golang编译出go文件的package命名空间
 option go_package = "github.com/smallgamefish/BreakBricks/protoc";

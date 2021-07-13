@@ -86,7 +86,8 @@ func main() {
 
 		case *protoc.ClientSendMsg_LeaveRoomEvent:
 			//离开房间的事件
-
+			err = roomManage.LeaveRoom(event.LeaveRoomEvent.GetRoomId(), remoteAddr)
+			log.Println("离开房间失败:", err)
 		}
 
 		////玩家加入房间

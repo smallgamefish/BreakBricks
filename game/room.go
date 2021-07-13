@@ -100,10 +100,12 @@ func (g *Room) Run() {
 			if _, ok := g.udpAddrMap[leave.String()]; ok {
 				//删除这个用户
 				delete(g.udpAddrMap, leave.String())
+
 				if g.status == Full {
 					//满员状态的切换成等待状态
 					g.status = Prepare
 				}
+
 				if g.status == Prepare {
 					//如果房间是等待状态的
 					//服务端主动广播一个刷新房间用户的事件
