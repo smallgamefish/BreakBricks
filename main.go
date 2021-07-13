@@ -83,14 +83,16 @@ func main() {
 		case *protoc.ClientSendMsg_JoinRoomEvent:
 			//加入房间的事件
 			err = roomManage.JoinRoom(event.JoinRoomEvent.GetRoomId(), remoteAddr)
-			log.Println("加入房间失败:", err)
+			log.Println("加入房间:", err)
 
 		case *protoc.ClientSendMsg_LeaveRoomEvent:
 			//离开房间的事件
 			err = roomManage.LeaveRoom(event.LeaveRoomEvent.GetRoomId(), remoteAddr)
-			log.Println("离开房间失败:", err)
+			log.Println("离开房间:", err)
 		case *protoc.ClientSendMsg_BroadcastEvent:
 			//广播事件
+			err = roomManage.BroadcastEvent(event.BroadcastEvent.GetRoomId(), event)
+			log.Println("广播事件:", err)
 		}
 
 	}

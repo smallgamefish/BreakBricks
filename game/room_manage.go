@@ -3,6 +3,7 @@ package game
 import (
 	"errors"
 	"fmt"
+	"github.com/smallgamefish/BreakBricks/protoc/github.com/smallgamefish/BreakBricks/protoc"
 	"net"
 	"sync"
 )
@@ -101,4 +102,20 @@ func (m *roomManage) GetRoom(roomId string) (*Room, error) {
 	}
 
 	return nil, errors.New("房间找不到")
+}
+
+//广播事件
+func (m *roomManage) BroadcastEvent(roomId string, event *protoc.ClientSendMsg_BroadcastEvent) error {
+	room, err := m.GetRoom(roomId)
+	if err != nil {
+		return err
+	}
+
+	response := &protoc.ClientAcceptMsg{
+		Code:  protoc.ClientAcceptMsg_Success,
+		Event: &protoc.ClientAcceptMsg_BroadcastEvent{BroadcastEvent: &protoc.BroadcastEvent{RoomId: roomId, Event: event.BroadcastEvent.Event}},
+	}
+	
+	room.GetBroadcastChan() <- response
+	return nil
 }
