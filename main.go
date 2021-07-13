@@ -63,19 +63,34 @@ func main() {
 
 		case *protoc.ClientSendMsg_CreateRoomEvent:
 			//创建房间的事件
-			err = roomManage.AddRoom(event.CreateRoomEvent.GetCreateRoomId())
-			response := new(protoc.ClientAcceptMsg)
+			err = roomManage.AddRoom(event.CreateRoomEvent.GetRoomId())
 
+			response := new(protoc.ClientAcceptMsg)
 			if err != nil {
 				response.Code = protoc.ClientAcceptMsg_Error
 				response.Error = err.Error()
 			} else {
 				response.Code = protoc.ClientAcceptMsg_Success
 				response.Event = &protoc.ClientAcceptMsg_CreateRoomEvent{CreateRoomEvent: &protoc.CreateRoomEvent{
-					CreateRoomId: event.CreateRoomEvent.GetCreateRoomId(),
+					RoomId: event.CreateRoomEvent.GetRoomId(),
 				}}
 			}
 
+			responseData, _ := proto.Marshal(response)
+			socket.WriteToUDP(responseData, remoteAddr)
+			continue
+		case *protoc.ClientSendMsg_JoinRoomEvent:
+			err = roomManage.JoinRoom(event.JoinRoomEvent.GetRoomId(), remoteAddr)
+
+			response := new(protoc.ClientAcceptMsg)
+			if err != nil {
+				response.Code = protoc.ClientAcceptMsg_Error
+				response.Error = err.Error()
+			} else {
+				response.Code = protoc.ClientAcceptMsg_Success
+				response.Event = &protoc.ClientAcceptMsg_JoinRoomEvent{JoinRoomEvent: &protoc.JoinRoomEvent{RoomId: event.JoinRoomEvent.GetRoomId()}}
+			}
+			
 			responseData, _ := proto.Marshal(response)
 			socket.WriteToUDP(responseData, remoteAddr)
 			continue

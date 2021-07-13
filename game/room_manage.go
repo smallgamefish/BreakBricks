@@ -39,6 +39,23 @@ func (m *RoomManage) AddRoom(roomId string) error {
 	return nil
 }
 
+//用户加入房间
+func (m *RoomManage) JoinRoom(roomId string, user *net.UDPAddr) error {
+	m.RLock()
+	defer m.RUnlock()
+
+	room, err := m.GetRoom(roomId)
+	if err != nil {
+		return err
+	}
+
+	if room.isJoin() {
+		room.JoinChan() <- user
+	}
+
+	return errors.New("无法加入房间")
+}
+
 //删除一个房间
 func (m *RoomManage) DeleteRoom(roomId string) {
 	m.Lock()

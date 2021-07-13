@@ -11,6 +11,7 @@ option go_package = "github.com/smallgamefish/BreakBricks/protoc";
 message ClientSendMsg {
   oneof Event {
     CreateRoomEvent createRoomEvent = 1;
+    JoinRoomEvent   joinRoomEvent = 2;
   }
 }
 
@@ -27,5 +28,6 @@ message ClientAcceptMsg{
 
   oneof Event {
     CreateRoomEvent createRoomEvent = 3;
+    JoinRoomEvent   joinRoomEvent = 4;
   }
 }
