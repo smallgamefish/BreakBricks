@@ -23,7 +23,7 @@ message LeaveRoomEvent {
   string roomId = 1;  //离开房间的id
 }
 
-//刷新房间的玩家
+//刷新房间的玩家事件
 message RefreshRoomPlayerEvent {
   repeated Player Players = 1;
 }

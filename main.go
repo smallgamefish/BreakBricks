@@ -32,7 +32,8 @@ func main() {
 
 	log.Println("启动服务")
 
-	roomManage := game.NewRoomManage(socket)
+	roomManage := game.RoomManage
+	roomManage.SetConn(socket)
 
 	//监听用户链接
 	for {
@@ -88,7 +89,9 @@ func main() {
 			//离开房间的事件
 			err = roomManage.LeaveRoom(event.LeaveRoomEvent.GetRoomId(), remoteAddr)
 			log.Println("离开房间失败:", err)
+		case *protoc.ClientSendMsg_BroadcastEvent:
+			//广播事件
 		}
-		
+
 	}
 }

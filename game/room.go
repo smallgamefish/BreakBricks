@@ -24,7 +24,8 @@ type Room struct {
 	status       RoomStatus                   //状态 0: 等待人满,1人满,2游戏中
 	maxUserTotal uint8                        //房间最大的人员
 	conn         *net.UDPConn                 //udp服务器的唯一链接
-	udpAddrMap   map[string]*net.UDPAddr      //加入房间的client
+	udpAddrMap   map[string]*net.UDPAddr      //加入房间的client,key是udp唯一标识
+	readyPlayer  map[string]bool              //进入准备状态的用户,key是udp唯一标识
 	closeRoom    chan bool                    //关闭房间，无缓冲通道
 	join         chan *net.UDPAddr            //用户加入房间,  无缓冲，一个一个进入
 	leave        chan *net.UDPAddr            //用户离开房间，无缓冲，一个一个离开
@@ -39,6 +40,7 @@ func NewRoom(id string, conn *net.UDPConn) *Room {
 		maxUserTotal: 2,
 		conn:         conn,
 		udpAddrMap:   make(map[string]*net.UDPAddr),
+		readyPlayer:  make(map[string]bool),
 		closeRoom:    make(chan bool),
 		join:         make(chan *net.UDPAddr),
 		leave:        make(chan *net.UDPAddr),
@@ -129,7 +131,7 @@ func (g *Room) Run() {
 			for i := 0; i < n; i++ {
 				g.sendMsg(<-g.broadcast)
 			}
-			
+
 		case <-g.closeRoom:
 			//关闭房间
 			g.Close()
@@ -159,4 +161,6 @@ func (g *Room) Close() {
 	g.udpAddrMap = nil
 	close(g.join)
 	close(g.broadcast)
+
+	RoomManage.deleteRoom(g.id)
 }

@@ -3,6 +3,7 @@ syntax = "proto3";
 package break_bricks.protoc;
 
 import  "room_event.proto";
+import "broadcast_event.proto";
 
 //golang编译出go文件的package命名空间
 option go_package = "github.com/smallgamefish/BreakBricks/protoc";
@@ -10,9 +11,10 @@ option go_package = "github.com/smallgamefish/BreakBricks/protoc";
 //客户端发送udp的msg消息格式
 message ClientSendMsg {
   oneof Event {
-    CreateRoomEvent createRoomEvent = 1;
-    JoinRoomEvent   joinRoomEvent = 2;
-    LeaveRoomEvent  leaveRoomEvent = 3;
+    CreateRoomEvent createRoomEvent = 1;  //创建房间事件
+    JoinRoomEvent   joinRoomEvent = 2;    //加入房间事件
+    LeaveRoomEvent  leaveRoomEvent = 3;  //离开房间事件
+    BroadcastEvent broadcastEvent = 4;   //数据转发、下发事件
   }
 }
 
@@ -28,7 +30,8 @@ message ClientAcceptMsg{
   string error = 2;
 
   oneof Event {
-    CreateRoomEvent createRoomEvent = 3;
-    RefreshRoomPlayerEvent refreshRoomPlayerEvent = 4;
+    CreateRoomEvent createRoomEvent = 3;    //创建房间事件
+    RefreshRoomPlayerEvent refreshRoomPlayerEvent = 4;  //刷新房间用户事件
+    BroadcastEvent broadcastEvent = 5;   //数据转发，下发事件
   }
 }

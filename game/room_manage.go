@@ -12,18 +12,28 @@ const (
 )
 
 //房间管理者
-type RoomManage struct {
+var RoomManage *roomManage
+
+func init() {
+	if RoomManage == nil {
+		RoomManage = &roomManage{conn: nil, roomMap: make(map[string]*Room)}
+	}
+}
+
+//房间管理者
+type roomManage struct {
 	conn    *net.UDPConn     //udp服务器的唯一链接
 	roomMap map[string]*Room //房间地图
 	sync.RWMutex
 }
 
-func NewRoomManage(conn *net.UDPConn) *RoomManage {
-	return &RoomManage{conn: conn, roomMap: make(map[string]*Room)}
+//设置链接
+func (m *roomManage) SetConn(conn *net.UDPConn) {
+	m.conn = conn
 }
 
 //新建一个房间，成功返回true，失败返回false
-func (m *RoomManage) AddRoom(roomId string) error {
+func (m *roomManage) AddRoom(roomId string) error {
 	m.Lock()
 	defer m.Unlock()
 
@@ -43,7 +53,7 @@ func (m *RoomManage) AddRoom(roomId string) error {
 }
 
 //用户加入房间
-func (m *RoomManage) JoinRoom(roomId string, player *net.UDPAddr) error {
+func (m *roomManage) JoinRoom(roomId string, player *net.UDPAddr) error {
 
 	room, err := m.GetRoom(roomId)
 	if err != nil {
@@ -57,7 +67,7 @@ func (m *RoomManage) JoinRoom(roomId string, player *net.UDPAddr) error {
 }
 
 //用户离开房间
-func (m *RoomManage) LeaveRoom(roomId string, player *net.UDPAddr) error {
+func (m *roomManage) LeaveRoom(roomId string, player *net.UDPAddr) error {
 
 	room, err := m.GetRoom(roomId)
 	if err != nil {
@@ -70,13 +80,11 @@ func (m *RoomManage) LeaveRoom(roomId string, player *net.UDPAddr) error {
 }
 
 //删除一个房间
-func (m *RoomManage) DeleteRoom(roomId string) {
+func (m *roomManage) deleteRoom(roomId string) {
 	m.Lock()
 	defer m.Unlock()
 
-	if room, ok := m.roomMap[roomId]; ok {
-		//房间资源释放
-		room.Close()
+	if _, ok := m.roomMap[roomId]; ok {
 		//删除map
 		delete(m.roomMap, roomId)
 	}
@@ -84,7 +92,7 @@ func (m *RoomManage) DeleteRoom(roomId string) {
 }
 
 //获取房间
-func (m *RoomManage) GetRoom(roomId string) (*Room, error) {
+func (m *roomManage) GetRoom(roomId string) (*Room, error) {
 	m.RLock()
 	defer m.RUnlock()
 

@@ -169,7 +169,7 @@ func (x *LeaveRoomEvent) GetRoomId() string {
 	return ""
 }
 
-//刷新房间的玩家
+//刷新房间的玩家事件
 type RefreshRoomPlayerEvent struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

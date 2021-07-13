@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package break_bricks.protoc;
+
+//golang编译出go文件的package命名空间
+option go_package = "github.com/smallgamefish/BreakBricks/protoc";
+
+//游戏中的广播事件
+message BroadcastEvent {
+  string roomId = 1;
+  oneof Event{
+    ReadyEvent readyEvent = 2;
+    StartGameEvent startGameEvent = 3;
+  }
+}
+
+
+//准备事件
+message ReadyEvent {
+  string roomId = 1;
+  bool ready = 2;  //true准备，false取消准备
+}
+
+//开始游戏事件
+message StartGameEvent {
+  string name = 1;    //展示没有什么用
+}
