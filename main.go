@@ -89,10 +89,10 @@ func main() {
 			//离开房间的事件
 			err = roomManage.LeaveRoom(event.LeaveRoomEvent.GetRoomId(), remoteAddr)
 			log.Println("离开房间:", err)
-		case *protoc.ClientSendMsg_BroadcastEvent:
-			//广播事件
-			err = roomManage.BroadcastEvent(event.BroadcastEvent.GetRoomId(), remoteAddr, event)
-			log.Println("广播事件:", err)
+
+		case *protoc.ClientSendMsg_ReadyEvent:
+			err = roomManage.ReadyRoom(event.ReadyEvent.GetRoomId(), remoteAddr)
+			log.Println("用户在房间内准备:", err)
 		}
 
 	}

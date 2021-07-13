@@ -27,3 +27,14 @@ message LeaveRoomEvent {
 message RefreshRoomPlayerEvent {
   repeated Player Players = 1;
 }
+
+//准备事件
+message ReadyEvent {
+  string roomId = 1;
+  bool ready = 2;  //true准备，false取消准备
+}
+
+//开始游戏事件
+message StartGameEvent {
+  string name = 1;    //展示没有什么用
+}

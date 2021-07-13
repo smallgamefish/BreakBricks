@@ -217,6 +217,110 @@ func (x *RefreshRoomPlayerEvent) GetPlayers() []*Player {
 	return nil
 }
 
+//准备事件
+type ReadyEvent struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	RoomId string `protobuf:"bytes,1,opt,name=roomId,proto3" json:"roomId,omitempty"`
+	Ready  bool   `protobuf:"varint,2,opt,name=ready,proto3" json:"ready,omitempty"` //true准备，false取消准备
+}
+
+func (x *ReadyEvent) Reset() {
+	*x = ReadyEvent{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_room_event_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ReadyEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReadyEvent) ProtoMessage() {}
+
+func (x *ReadyEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_room_event_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReadyEvent.ProtoReflect.Descriptor instead.
+func (*ReadyEvent) Descriptor() ([]byte, []int) {
+	return file_room_event_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ReadyEvent) GetRoomId() string {
+	if x != nil {
+		return x.RoomId
+	}
+	return ""
+}
+
+func (x *ReadyEvent) GetReady() bool {
+	if x != nil {
+		return x.Ready
+	}
+	return false
+}
+
+//开始游戏事件
+type StartGameEvent struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"` //展示没有什么用
+}
+
+func (x *StartGameEvent) Reset() {
+	*x = StartGameEvent{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_room_event_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *StartGameEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartGameEvent) ProtoMessage() {}
+
+func (x *StartGameEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_room_event_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartGameEvent.ProtoReflect.Descriptor instead.
+func (*StartGameEvent) Descriptor() ([]byte, []int) {
+	return file_room_event_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *StartGameEvent) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
 var File_room_event_proto protoreflect.FileDescriptor
 
 var file_room_event_proto_rawDesc = []byte{
@@ -236,10 +340,16 @@ var file_room_event_proto_rawDesc = []byte{
 	0x07, 0x50, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1b,
 	0x2e, 0x62, 0x72, 0x65, 0x61, 0x6b, 0x5f, 0x62, 0x72, 0x69, 0x63, 0x6b, 0x73, 0x2e, 0x70, 0x72,
 	0x6f, 0x74, 0x6f, 0x63, 0x2e, 0x50, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x52, 0x07, 0x50, 0x6c, 0x61,
-	0x79, 0x65, 0x72, 0x73, 0x42, 0x2d, 0x5a, 0x2b, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63,
-	0x6f, 0x6d, 0x2f, 0x73, 0x6d, 0x61, 0x6c, 0x6c, 0x67, 0x61, 0x6d, 0x65, 0x66, 0x69, 0x73, 0x68,
-	0x2f, 0x42, 0x72, 0x65, 0x61, 0x6b, 0x42, 0x72, 0x69, 0x63, 0x6b, 0x73, 0x2f, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x63, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x79, 0x65, 0x72, 0x73, 0x22, 0x3a, 0x0a, 0x0a, 0x52, 0x65, 0x61, 0x64, 0x79, 0x45, 0x76, 0x65,
+	0x6e, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x6f, 0x6f, 0x6d, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x06, 0x72, 0x6f, 0x6f, 0x6d, 0x49, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x72, 0x65,
+	0x61, 0x64, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x72, 0x65, 0x61, 0x64, 0x79,
+	0x22, 0x24, 0x0a, 0x0e, 0x53, 0x74, 0x61, 0x72, 0x74, 0x47, 0x61, 0x6d, 0x65, 0x45, 0x76, 0x65,
+	0x6e, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x42, 0x2d, 0x5a, 0x2b, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
+	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x6d, 0x61, 0x6c, 0x6c, 0x67, 0x61, 0x6d, 0x65, 0x66, 0x69,
+	0x73, 0x68, 0x2f, 0x42, 0x72, 0x65, 0x61, 0x6b, 0x42, 0x72, 0x69, 0x63, 0x6b, 0x73, 0x2f, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x63, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -254,16 +364,18 @@ func file_room_event_proto_rawDescGZIP() []byte {
 	return file_room_event_proto_rawDescData
 }
 
-var file_room_event_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_room_event_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_room_event_proto_goTypes = []interface{}{
 	(*CreateRoomEvent)(nil),        // 0: break_bricks.protoc.CreateRoomEvent
 	(*JoinRoomEvent)(nil),          // 1: break_bricks.protoc.JoinRoomEvent
 	(*LeaveRoomEvent)(nil),         // 2: break_bricks.protoc.LeaveRoomEvent
 	(*RefreshRoomPlayerEvent)(nil), // 3: break_bricks.protoc.RefreshRoomPlayerEvent
-	(*Player)(nil),                 // 4: break_bricks.protoc.Player
+	(*ReadyEvent)(nil),             // 4: break_bricks.protoc.ReadyEvent
+	(*StartGameEvent)(nil),         // 5: break_bricks.protoc.StartGameEvent
+	(*Player)(nil),                 // 6: break_bricks.protoc.Player
 }
 var file_room_event_proto_depIdxs = []int32{
-	4, // 0: break_bricks.protoc.RefreshRoomPlayerEvent.Players:type_name -> break_bricks.protoc.Player
+	6, // 0: break_bricks.protoc.RefreshRoomPlayerEvent.Players:type_name -> break_bricks.protoc.Player
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -326,6 +438,30 @@ func file_room_event_proto_init() {
 				return nil
 			}
 		}
+		file_room_event_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ReadyEvent); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_room_event_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*StartGameEvent); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -333,7 +469,7 @@ func file_room_event_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_room_event_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

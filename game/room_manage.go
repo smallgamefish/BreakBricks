@@ -3,7 +3,6 @@ package game
 import (
 	"errors"
 	"fmt"
-	"github.com/smallgamefish/BreakBricks/protoc/github.com/smallgamefish/BreakBricks/protoc"
 	"net"
 	"sync"
 )
@@ -62,7 +61,7 @@ func (m *roomManage) JoinRoom(roomId string, player *net.UDPAddr) error {
 	}
 
 	//加入房间
-	room.GetJoinChan() <- player
+	room.GetJoinChan() <- NewPlayer(player)
 
 	return nil
 }
@@ -75,7 +74,19 @@ func (m *roomManage) LeaveRoom(roomId string, player *net.UDPAddr) error {
 		return err
 	}
 
-	room.GetLeaveChan() <- player
+	room.GetLeaveChan() <- NewPlayer(player)
+
+	return nil
+}
+
+//用户准备
+func (m *roomManage) ReadyRoom(roomId string, player *net.UDPAddr) error {
+	room, err := m.GetRoom(roomId)
+	if err != nil {
+		return err
+	}
+
+	room.getReadyChan() <- NewPlayer(player)
 
 	return nil
 }
@@ -102,41 +113,4 @@ func (m *roomManage) GetRoom(roomId string) (*Room, error) {
 	}
 
 	return nil, errors.New("房间找不到")
-}
-
-//广播事件
-func (m *roomManage) BroadcastEvent(roomId string, player *net.UDPAddr, event *protoc.ClientSendMsg_BroadcastEvent) error {
-	room, err := m.GetRoom(roomId)
-	if err != nil {
-		return err
-	}
-
-	response := &protoc.ClientAcceptMsg{
-		Code: protoc.ClientAcceptMsg_Success,
-		Event: &protoc.ClientAcceptMsg_BroadcastEvent{BroadcastEvent: &protoc.BroadcastEvent{
-			RoomId: roomId,
-			Event:  event.BroadcastEvent.Event,
-		}},
-	}
-
-	//需要特殊处理的事件
-	switch specialEvent := event.BroadcastEvent.Event.(type) {
-	case *protoc.BroadcastEvent_ReadyEvent:
-		//用户的准备事件
-		response.Event = &protoc.ClientAcceptMsg_BroadcastEvent{
-			BroadcastEvent: &protoc.BroadcastEvent{
-				RoomId: roomId,
-				Event: &protoc.BroadcastEvent_ReadyEvent{
-					ReadyEvent: &protoc.ReadyEvent{
-						RoomId: specialEvent.ReadyEvent.GetRoomId(),
-						Ready:  specialEvent.ReadyEvent.GetReady(),
-						Player: &protoc.Player{
-							UdpString: player.String(),
-						},
-					}},
-			}}
-	}
-
-	room.GetBroadcastChan() <- response
-	return nil
 }
