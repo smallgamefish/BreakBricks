@@ -89,12 +89,6 @@ func main() {
 			err = roomManage.LeaveRoom(event.LeaveRoomEvent.GetRoomId(), remoteAddr)
 			log.Println("离开房间失败:", err)
 		}
-
-		////玩家加入房间
-		//gameRoom.JoinChan() <- remoteAddr
-		//
-		//
-		////广播消息
-		//gameRoom.broadcast <- data
+		
 	}
 }
