@@ -157,19 +157,19 @@ type isClientSendMsg_Event interface {
 }
 
 type ClientSendMsg_CreateRoomEvent struct {
-	CreateRoomEvent *CreateRoomEvent `protobuf:"bytes,1,opt,name=createRoomEvent,proto3,oneof"`
+	CreateRoomEvent *CreateRoomEvent `protobuf:"bytes,1,opt,name=createRoomEvent,proto3,oneof"` //创建房间事件
 }
 
 type ClientSendMsg_JoinRoomEvent struct {
-	JoinRoomEvent *JoinRoomEvent `protobuf:"bytes,2,opt,name=joinRoomEvent,proto3,oneof"`
+	JoinRoomEvent *JoinRoomEvent `protobuf:"bytes,2,opt,name=joinRoomEvent,proto3,oneof"` //加入房间事件
 }
 
 type ClientSendMsg_LeaveRoomEvent struct {
-	LeaveRoomEvent *LeaveRoomEvent `protobuf:"bytes,3,opt,name=leaveRoomEvent,proto3,oneof"`
+	LeaveRoomEvent *LeaveRoomEvent `protobuf:"bytes,3,opt,name=leaveRoomEvent,proto3,oneof"` //离开房间事件
 }
 
 type ClientSendMsg_BroadcastEvent struct {
-	BroadcastEvent *BroadcastEvent `protobuf:"bytes,4,opt,name=broadcastEvent,proto3,oneof"`
+	BroadcastEvent *BroadcastEvent `protobuf:"bytes,4,opt,name=broadcastEvent,proto3,oneof"` //数据转发、下发事件
 }
 
 func (*ClientSendMsg_CreateRoomEvent) isClientSendMsg_Event() {}
@@ -275,15 +275,15 @@ type isClientAcceptMsg_Event interface {
 }
 
 type ClientAcceptMsg_CreateRoomEvent struct {
-	CreateRoomEvent *CreateRoomEvent `protobuf:"bytes,3,opt,name=createRoomEvent,proto3,oneof"`
+	CreateRoomEvent *CreateRoomEvent `protobuf:"bytes,3,opt,name=createRoomEvent,proto3,oneof"` //创建房间事件
 }
 
 type ClientAcceptMsg_RefreshRoomPlayerEvent struct {
-	RefreshRoomPlayerEvent *RefreshRoomPlayerEvent `protobuf:"bytes,4,opt,name=refreshRoomPlayerEvent,proto3,oneof"`
+	RefreshRoomPlayerEvent *RefreshRoomPlayerEvent `protobuf:"bytes,4,opt,name=refreshRoomPlayerEvent,proto3,oneof"` //刷新房间用户事件
 }
 
 type ClientAcceptMsg_BroadcastEvent struct {
-	BroadcastEvent *BroadcastEvent `protobuf:"bytes,5,opt,name=broadcastEvent,proto3,oneof"`
+	BroadcastEvent *BroadcastEvent `protobuf:"bytes,5,opt,name=broadcastEvent,proto3,oneof"` //数据转发，下发事件
 }
 
 func (*ClientAcceptMsg_CreateRoomEvent) isClientAcceptMsg_Event() {}

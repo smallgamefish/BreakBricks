@@ -105,17 +105,24 @@ func (m *roomManage) GetRoom(roomId string) (*Room, error) {
 }
 
 //广播事件
-func (m *roomManage) BroadcastEvent(roomId string, event *protoc.ClientSendMsg_BroadcastEvent) error {
+func (m *roomManage) BroadcastEvent(roomId string, player *net.UDPAddr, event *protoc.ClientSendMsg_BroadcastEvent) error {
 	room, err := m.GetRoom(roomId)
 	if err != nil {
 		return err
 	}
 
 	response := &protoc.ClientAcceptMsg{
-		Code:  protoc.ClientAcceptMsg_Success,
-		Event: &protoc.ClientAcceptMsg_BroadcastEvent{BroadcastEvent: &protoc.BroadcastEvent{RoomId: roomId, Event: event.BroadcastEvent.Event}},
+		Code: protoc.ClientAcceptMsg_Success,
+		Event: &protoc.ClientAcceptMsg_BroadcastEvent{BroadcastEvent: &protoc.BroadcastEvent{
+			RoomId: roomId,
+			Event: &protoc.BroadcastEvent_ReadyEvent{
+				ReadyEvent: &protoc.ReadyEvent{
+					Player: &protoc.Player{
+						UdpString: roomId,
+					}}},
+		}},
 	}
-	
+
 	room.GetBroadcastChan() <- response
 	return nil
 }

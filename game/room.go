@@ -124,7 +124,17 @@ func (g *Room) Run() {
 			}
 
 		case data := <-g.broadcast:
-			//广播消息
+
+			//特殊类型的消息处理
+			switch event := data.Event.(type) {
+			case *protoc.ClientAcceptMsg_BroadcastEvent:
+				switch event.BroadcastEvent.Event.(type) {
+				case *protoc.BroadcastEvent_ReadyEvent:
+					//如果是用户准备事件
+				}
+			}
+
+			//广播游戏消息
 			g.sendMsg(data)
 			//判断一下chan是否有缓冲信息，如果有，消费完它
 			n := len(g.broadcast)

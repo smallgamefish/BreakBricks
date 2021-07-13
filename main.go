@@ -91,7 +91,7 @@ func main() {
 			log.Println("离开房间:", err)
 		case *protoc.ClientSendMsg_BroadcastEvent:
 			//广播事件
-			err = roomManage.BroadcastEvent(event.BroadcastEvent.GetRoomId(), event)
+			err = roomManage.BroadcastEvent(event.BroadcastEvent.GetRoomId(), remoteAddr, event)
 			log.Println("广播事件:", err)
 		}
 

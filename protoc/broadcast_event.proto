@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package break_bricks.protoc;
 
+import "player.proto";
+
 //golang编译出go文件的package命名空间
 option go_package = "github.com/smallgamefish/BreakBricks/protoc";
 
@@ -19,6 +21,7 @@ message BroadcastEvent {
 message ReadyEvent {
   string roomId = 1;
   bool ready = 2;  //true准备，false取消准备
+  Player player = 3;
 }
 
 //开始游戏事件
