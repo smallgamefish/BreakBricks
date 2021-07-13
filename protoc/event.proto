@@ -18,6 +18,11 @@ message JoinRoomEvent {
   string roomId = 1;  //加入房间的id
 }
 
+//离开房间事件
+message LeaveRoomEvent {
+  string roomId = 1;  //离开房间的id
+}
+
 //刷新房间的玩家
 message RefreshRoomPlayerEvent {
   repeated Player Players = 1;

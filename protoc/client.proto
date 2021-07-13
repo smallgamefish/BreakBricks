@@ -12,6 +12,7 @@ message ClientSendMsg {
   oneof Event {
     CreateRoomEvent createRoomEvent = 1;
     JoinRoomEvent   joinRoomEvent = 2;
+    LeaveRoomEvent  leaveRoomEvent = 3;
   }
 }
 

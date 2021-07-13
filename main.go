@@ -78,22 +78,15 @@ func main() {
 
 			responseData, _ := proto.Marshal(response)
 			socket.WriteToUDP(responseData, remoteAddr)
-			continue
+
 		case *protoc.ClientSendMsg_JoinRoomEvent:
 			//加入房间的事件
 			err = roomManage.JoinRoom(event.JoinRoomEvent.GetRoomId(), remoteAddr)
+			log.Println("加入房间失败:", err)
 
-			response := new(protoc.ClientAcceptMsg)
-			if err != nil {
-				response.Code = protoc.ClientAcceptMsg_Error
-				response.Error = err.Error()
-			} else {
-				response.Code = protoc.ClientAcceptMsg_Success
-			}
+		case *protoc.ClientSendMsg_LeaveRoomEvent:
+			//离开房间的事件
 
-			responseData, _ := proto.Marshal(response)
-			socket.WriteToUDP(responseData, remoteAddr)
-			continue
 		}
 
 		////玩家加入房间

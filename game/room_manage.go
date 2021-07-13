@@ -3,7 +3,6 @@ package game
 import (
 	"errors"
 	"fmt"
-	"github.com/smallgamefish/BreakBricks/protoc/github.com/smallgamefish/BreakBricks/protoc"
 	"net"
 	"sync"
 )
@@ -44,26 +43,30 @@ func (m *RoomManage) AddRoom(roomId string) error {
 }
 
 //用户加入房间
-func (m *RoomManage) JoinRoom(roomId string, user *net.UDPAddr) error {
-	m.RLock()
-	defer m.RUnlock()
+func (m *RoomManage) JoinRoom(roomId string, player *net.UDPAddr) error {
 
 	room, err := m.GetRoom(roomId)
 	if err != nil {
 		return err
 	}
 
-	if room.isJoin() {
-		//加入房间
-		room.GetJoinChan() <- user
-		//广播一个加入房间的消息
-		response := new(protoc.ClientAcceptMsg)
-		response.Code = protoc.ClientAcceptMsg_Success
-		response.Event = &protoc.ClientAcceptMsg_JoinRoomEvent{JoinRoomEvent: &protoc.JoinRoomEvent{RoomId: roomId}}
-		room.GetBroadcastChan() <- response
+	//加入房间
+	room.GetJoinChan() <- player
+
+	return nil
+}
+
+//用户离开房间
+func (m *RoomManage) LeaveRoom(roomId string, player *net.UDPAddr) error {
+
+	room, err := m.GetRoom(roomId)
+	if err != nil {
+		return err
 	}
 
-	return errors.New("无法加入房间")
+	room.GetLeaveChan() <- player
+
+	return nil
 }
 
 //删除一个房间
