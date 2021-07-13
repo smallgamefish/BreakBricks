@@ -1,7 +1,9 @@
 package game
 
 import (
+	"github.com/smallgamefish/BreakBricks/protoc/github.com/smallgamefish/BreakBricks/protoc"
 	"net"
+	"github.com/golang/protobuf/proto"
 )
 
 //游戏状态
@@ -19,14 +21,15 @@ const (
 
 //房间
 type Room struct {
-	id           string                  //房间的唯一标识
-	status       RoomStatus              //状态 0: 空闲中,1准备等待人满,2满员,3游戏中
-	maxUserTotal uint8                   //房间最大的人员
-	conn         *net.UDPConn            //udp服务器的唯一链接
-	udpAddrMap   map[string]*net.UDPAddr //加入房间的client
-	join         chan *net.UDPAddr       //用户加入房间,  无缓冲，一个一个进入
-	leave        chan *net.UDPAddr       //用户离开房间
-	broadcast    chan []byte             //广播消息,无缓冲，要保证事件的顺序
+	id           string                       //房间的唯一标识
+	status       RoomStatus                   //状态 0: 空闲中,1准备等待人满,2满员,3游戏中
+	maxUserTotal uint8                        //房间最大的人员
+	conn         *net.UDPConn                 //udp服务器的唯一链接
+	udpAddrMap   map[string]*net.UDPAddr      //加入房间的client
+	closeRoom    chan bool                    //关闭房间，无缓冲通道
+	join         chan *net.UDPAddr            //用户加入房间,  无缓冲，一个一个进入
+	leave        chan *net.UDPAddr            //用户离开房间
+	broadcast    chan *protoc.ClientAcceptMsg //广播消息,无缓冲，要保证事件的顺序
 }
 
 //创建一个房间
@@ -37,8 +40,9 @@ func NewRoom(id string, conn *net.UDPConn) *Room {
 		maxUserTotal: 2,
 		conn:         conn,
 		udpAddrMap:   make(map[string]*net.UDPAddr),
+		closeRoom:    make(chan bool),
 		join:         make(chan *net.UDPAddr),
-		broadcast:    make(chan []byte),
+		broadcast:    make(chan *protoc.ClientAcceptMsg),
 	}
 }
 
@@ -51,8 +55,12 @@ func (g *Room) isJoin() bool {
 }
 
 //加入房间
-func (g *Room) JoinChan() chan<- *net.UDPAddr {
+func (g *Room) GetJoinChan() chan<- *net.UDPAddr {
 	return g.join
+}
+
+func (g *Room) GetBroadcastChan() chan<- *protoc.ClientAcceptMsg {
+	return g.broadcast
 }
 
 //运行房间
@@ -82,12 +90,18 @@ func (g *Room) Run() {
 			}
 		case data := <-g.broadcast:
 			//广播消息
+			responseData, _ := proto.Marshal(data)
 			for _, udpAddr := range g.udpAddrMap {
-				n, err := g.conn.WriteToUDP(data, udpAddr)
+				n, err := g.conn.WriteToUDP(responseData, udpAddr)
 				if err != nil || n == 0 {
 					continue
 				}
 			}
+
+		case <-g.closeRoom:
+			//关闭房间
+			g.Close()
+			return
 		}
 	}
 }

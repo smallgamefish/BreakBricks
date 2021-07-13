@@ -35,7 +35,10 @@ func (m *RoomManage) AddRoom(roomId string) error {
 		return errors.New(fmt.Sprintf("服务器目前最多只支持%d个房间", MaxRoomNumber))
 	}
 
-	m.roomMap[roomId] = NewRoom(roomId, m.conn)
+	newRoom := NewRoom(roomId, m.conn)
+	m.roomMap[roomId] = newRoom
+	//启动房间
+	go newRoom.Run()
 	return nil
 }
 
@@ -50,7 +53,7 @@ func (m *RoomManage) JoinRoom(roomId string, user *net.UDPAddr) error {
 	}
 
 	if room.isJoin() {
-		room.JoinChan() <- user
+		room.GetJoinChan() <- user
 	}
 
 	return errors.New("无法加入房间")
