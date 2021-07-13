@@ -160,6 +160,9 @@ func (g *Room) Run() {
 				startGameEvent.Code = protoc.ClientAcceptMsg_Success
 				startGameEvent.Event = &protoc.ClientAcceptMsg_StartGameEvent{StartGameEvent: &protoc.StartGameEvent{Name: "战斗开始!"}}
 				g.GetBroadcastChan() <- startGameEvent
+
+				//切换到游戏中
+				g.status = Game
 			}
 
 		case data := <-g.broadcast:
