@@ -27,6 +27,9 @@ func dial() *net.UDPConn {
 
 //创建房间
 func createRoom(roomId string) {
+
+	log.Println("创建房间的roomId:", roomId)
+
 	socket := dial()
 
 	//创建房间
@@ -65,6 +68,8 @@ func createRoom(roomId string) {
 
 //加入房间
 func joinRoom(roomId string) {
+	log.Println("加入房间的roomId:", roomId)
+
 	socket := dial()
 	joinRoomRequest := &protoc.ClientSendMsg{Event: &protoc.ClientSendMsg_JoinRoomEvent{
 		JoinRoomEvent: &protoc.JoinRoomEvent{RoomId: roomId},
@@ -76,14 +81,14 @@ func joinRoom(roomId string) {
 		log.Fatalln("发送加入事件失败", err)
 	}
 
-	tick := time.Tick(30 * time.Second)
+	tick := time.Tick(3 * time.Second)
 
 	//30s后发送准备事件
 	go func() {
 		<-tick
-		
+
 		readyRequest := &protoc.ClientSendMsg{Event: &protoc.ClientSendMsg_ReadyEvent{
-			ReadyEvent: &protoc.ReadyEvent{RoomId: roomId},
+			ReadyEvent: &protoc.ReadyEvent{RoomId: roomId, Ready: true},
 		}}
 
 		readyData, _ := proto.Marshal(readyRequest)
@@ -91,6 +96,7 @@ func joinRoom(roomId string) {
 		if err != nil {
 			log.Fatalln("发送准备事件失败:", err)
 		}
+		log.Println("发送准备事件完毕")
 
 	}()
 
@@ -125,19 +131,19 @@ func joinRoom(roomId string) {
 
 func main() {
 
-	isJoinRoom := *flag.Bool("isJoinRoom", false, "true加入房间，false创建房间，默认是false创建房间")
-	roomId := *flag.String("roomId", "", "房间id")
+	isJoinRoom := flag.Bool("isJoinRoom", false, "true加入房间，false创建房间，默认是false创建房间")
+	roomId := flag.String("roomId", "", "房间id")
 
 	flag.Parse()
 
-	if strings.Compare("", roomId) == 0 {
+	if strings.Compare("", *roomId) == 0 {
 		log.Fatalln("房间号必填")
 	}
 
-	if isJoinRoom {
-		joinRoom(roomId)
+	if *isJoinRoom {
+		joinRoom(*roomId)
 	} else {
-		createRoom(roomId)
+		createRoom(*roomId)
 	}
 
 }

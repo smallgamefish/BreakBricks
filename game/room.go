@@ -154,7 +154,8 @@ func (g *Room) Run() {
 				}
 			}
 
-			if isStartGame {
+			if isStartGame && g.status == Full {
+				//状态是满员并且都准备了
 				//可以开始游戏了,下发开始游戏事件
 				startGameEvent := new(protoc.ClientAcceptMsg)
 				startGameEvent.Code = protoc.ClientAcceptMsg_Success

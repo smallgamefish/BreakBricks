@@ -80,13 +80,16 @@ func (m *roomManage) LeaveRoom(roomId string, player *net.UDPAddr) error {
 }
 
 //用户准备
-func (m *roomManage) ReadyRoom(roomId string, player *net.UDPAddr) error {
+func (m *roomManage) ReadyRoom(roomId string, player *net.UDPAddr, ready bool) error {
 	room, err := m.GetRoom(roomId)
 	if err != nil {
 		return err
 	}
 
-	room.getReadyChan() <- NewPlayer(player)
+	readyPlayer := NewPlayer(player)
+	readyPlayer.ready = ready
+
+	room.getReadyChan() <- readyPlayer
 
 	return nil
 }
@@ -100,7 +103,6 @@ func (m *roomManage) deleteRoom(roomId string) {
 		//删除map
 		delete(m.roomMap, roomId)
 	}
-
 }
 
 //获取房间

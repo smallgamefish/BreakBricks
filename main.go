@@ -91,7 +91,7 @@ func main() {
 			log.Println("离开房间:", err)
 
 		case *protoc.ClientSendMsg_ReadyEvent:
-			err = roomManage.ReadyRoom(event.ReadyEvent.GetRoomId(), remoteAddr)
+			err = roomManage.ReadyRoom(event.ReadyEvent.GetRoomId(), remoteAddr, event.ReadyEvent.Ready)
 			log.Println("用户在房间内准备:", err)
 		}
 
