@@ -15,6 +15,6 @@
 # vendor/
 
 .idea/
-#go.sum
+go.sum
 #docker容器生成的可执行文件，也不要纳入版本库
 BreakBricks
