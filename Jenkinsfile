@@ -18,9 +18,9 @@ pipeline {
             }
         }
         stage('docker里面运行golang应用') {
-                    steps {
-                        sh 'sudo docker-compose -f run-docker-compose.yml up -d'
-                    }
+            steps {
+                sh 'sudo docker-compose -f run-docker-compose.yml up -d'
+            }
         }
     }
 }
