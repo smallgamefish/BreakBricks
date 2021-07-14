@@ -9,4 +9,8 @@ option go_package = "github.com/smallgamefish/BreakBricks/protoc";
 message Player {
   //玩家udp标识
   string udpString = 1;
+  //在房间内是否准备,true准备，false没准备
+  bool ready = 2;
+  //上一次发送ping的时间
+  int64 lastAcceptPingTime = 3;
 }

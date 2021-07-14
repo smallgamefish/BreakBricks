@@ -14,6 +14,10 @@ message ClientSendMsg {
     JoinRoomEvent   joinRoomEvent = 2;    //加入房间事件
     LeaveRoomEvent  leaveRoomEvent = 3;  //离开房间事件
     ReadyEvent readyEvent = 4;   //准备事件
+    //心跳事件，udp是无状态的，不知道数据包发送出去服务器有没有接收到，自己弄一个ping机制，15s一次心跳检测
+    //如果服务器15秒内没有收到心跳检测，则代表用户断开了链接，服务器会释放用户的资源
+    //如果房间内的所有用户都断开，则释放房间资源
+    PingEvent pingEvent = 5;
   }
 }
 
@@ -32,6 +36,9 @@ message ClientAcceptMsg{
     CreateRoomEvent createRoomEvent = 3;    //创建房间事件
     RefreshRoomPlayerEvent refreshRoomPlayerEvent = 4;  //刷新房间用户事件
     StartGameEvent startGameEvent = 5;   //开始游戏事件
-    PingEvent pingEvent = 6;             //心跳事件
+    //心跳事件，udp是无状态的，不知道数据包发送出去服务器有没有接收到，自己弄一个ping机制，15s一次心跳检测
+    //如果服务器15秒内没有收到心跳检测，则代表用户断开了链接，服务器会释放用户的资源
+    //如果房间内的所有用户都断开，则释放房间资源
+    PingEvent pingEvent = 6;
   }
 }

@@ -93,6 +93,9 @@ func main() {
 		case *protoc.ClientSendMsg_ReadyEvent:
 			err = roomManage.ReadyRoom(event.ReadyEvent.GetRoomId(), remoteAddr, event.ReadyEvent.Ready)
 			log.Println("用户在房间内准备:", err)
+		case *protoc.ClientSendMsg_PingEvent:
+			//客户端要定时发送ping给服务端，否则，服务器会认为这个用户已经断开了链接，会释放资源
+
 		}
 
 	}

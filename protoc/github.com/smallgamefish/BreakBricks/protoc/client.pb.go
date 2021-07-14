@@ -82,6 +82,7 @@ type ClientSendMsg struct {
 	//	*ClientSendMsg_JoinRoomEvent
 	//	*ClientSendMsg_LeaveRoomEvent
 	//	*ClientSendMsg_ReadyEvent
+	//	*ClientSendMsg_PingEvent
 	Event isClientSendMsg_Event `protobuf_oneof:"Event"`
 }
 
@@ -152,6 +153,13 @@ func (x *ClientSendMsg) GetReadyEvent() *ReadyEvent {
 	return nil
 }
 
+func (x *ClientSendMsg) GetPingEvent() *PingEvent {
+	if x, ok := x.GetEvent().(*ClientSendMsg_PingEvent); ok {
+		return x.PingEvent
+	}
+	return nil
+}
+
 type isClientSendMsg_Event interface {
 	isClientSendMsg_Event()
 }
@@ -172,6 +180,13 @@ type ClientSendMsg_ReadyEvent struct {
 	ReadyEvent *ReadyEvent `protobuf:"bytes,4,opt,name=readyEvent,proto3,oneof"` //准备事件
 }
 
+type ClientSendMsg_PingEvent struct {
+	//心跳事件，udp是无状态的，不知道数据包发送出去服务器有没有接收到，自己弄一个ping机制，15s一次心跳检测
+	//如果服务器15秒内没有收到心跳检测，则代表用户断开了链接，服务器会释放用户的资源
+	//如果房间内的所有用户都断开，则释放房间资源
+	PingEvent *PingEvent `protobuf:"bytes,5,opt,name=pingEvent,proto3,oneof"`
+}
+
 func (*ClientSendMsg_CreateRoomEvent) isClientSendMsg_Event() {}
 
 func (*ClientSendMsg_JoinRoomEvent) isClientSendMsg_Event() {}
@@ -179,6 +194,8 @@ func (*ClientSendMsg_JoinRoomEvent) isClientSendMsg_Event() {}
 func (*ClientSendMsg_LeaveRoomEvent) isClientSendMsg_Event() {}
 
 func (*ClientSendMsg_ReadyEvent) isClientSendMsg_Event() {}
+
+func (*ClientSendMsg_PingEvent) isClientSendMsg_Event() {}
 
 //客户端接收udp的msg消息格式
 type ClientAcceptMsg struct {
@@ -295,7 +312,10 @@ type ClientAcceptMsg_StartGameEvent struct {
 }
 
 type ClientAcceptMsg_PingEvent struct {
-	PingEvent *PingEvent `protobuf:"bytes,6,opt,name=pingEvent,proto3,oneof"` //心跳事件
+	//心跳事件，udp是无状态的，不知道数据包发送出去服务器有没有接收到，自己弄一个ping机制，15s一次心跳检测
+	//如果服务器15秒内没有收到心跳检测，则代表用户断开了链接，服务器会释放用户的资源
+	//如果房间内的所有用户都断开，则释放房间资源
+	PingEvent *PingEvent `protobuf:"bytes,6,opt,name=pingEvent,proto3,oneof"`
 }
 
 func (*ClientAcceptMsg_CreateRoomEvent) isClientAcceptMsg_Event() {}
@@ -312,7 +332,7 @@ var file_client_proto_rawDesc = []byte{
 	0x0a, 0x0c, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x13,
 	0x62, 0x72, 0x65, 0x61, 0x6b, 0x5f, 0x62, 0x72, 0x69, 0x63, 0x6b, 0x73, 0x2e, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x63, 0x1a, 0x10, 0x72, 0x6f, 0x6f, 0x6d, 0x5f, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xc8, 0x02, 0x0a, 0x0d, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x88, 0x03, 0x0a, 0x0d, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74,
 	0x53, 0x65, 0x6e, 0x64, 0x4d, 0x73, 0x67, 0x12, 0x50, 0x0a, 0x0f, 0x63, 0x72, 0x65, 0x61, 0x74,
 	0x65, 0x52, 0x6f, 0x6f, 0x6d, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
 	0x32, 0x24, 0x2e, 0x62, 0x72, 0x65, 0x61, 0x6b, 0x5f, 0x62, 0x72, 0x69, 0x63, 0x6b, 0x73, 0x2e,
@@ -332,7 +352,11 @@ var file_client_proto_rawDesc = []byte{
 	0x6e, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x62, 0x72, 0x65, 0x61, 0x6b,
 	0x5f, 0x62, 0x72, 0x69, 0x63, 0x6b, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x2e, 0x52,
 	0x65, 0x61, 0x64, 0x79, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x48, 0x00, 0x52, 0x0a, 0x72, 0x65, 0x61,
-	0x64, 0x79, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x42, 0x07, 0x0a, 0x05, 0x45, 0x76, 0x65, 0x6e, 0x74,
+	0x64, 0x79, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x3e, 0x0a, 0x09, 0x70, 0x69, 0x6e, 0x67, 0x45,
+	0x76, 0x65, 0x6e, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x62, 0x72, 0x65,
+	0x61, 0x6b, 0x5f, 0x62, 0x72, 0x69, 0x63, 0x6b, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63,
+	0x2e, 0x50, 0x69, 0x6e, 0x67, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x48, 0x00, 0x52, 0x09, 0x70, 0x69,
+	0x6e, 0x67, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x42, 0x07, 0x0a, 0x05, 0x45, 0x76, 0x65, 0x6e, 0x74,
 	0x22, 0xd7, 0x03, 0x0a, 0x0f, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x41, 0x63, 0x63, 0x65, 0x70,
 	0x74, 0x4d, 0x73, 0x67, 0x12, 0x3d, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01,
 	0x28, 0x0e, 0x32, 0x29, 0x2e, 0x62, 0x72, 0x65, 0x61, 0x6b, 0x5f, 0x62, 0x72, 0x69, 0x63, 0x6b,
@@ -391,25 +415,26 @@ var file_client_proto_goTypes = []interface{}{
 	(*JoinRoomEvent)(nil),          // 4: break_bricks.protoc.JoinRoomEvent
 	(*LeaveRoomEvent)(nil),         // 5: break_bricks.protoc.LeaveRoomEvent
 	(*ReadyEvent)(nil),             // 6: break_bricks.protoc.ReadyEvent
-	(*RefreshRoomPlayerEvent)(nil), // 7: break_bricks.protoc.RefreshRoomPlayerEvent
-	(*StartGameEvent)(nil),         // 8: break_bricks.protoc.StartGameEvent
-	(*PingEvent)(nil),              // 9: break_bricks.protoc.PingEvent
+	(*PingEvent)(nil),              // 7: break_bricks.protoc.PingEvent
+	(*RefreshRoomPlayerEvent)(nil), // 8: break_bricks.protoc.RefreshRoomPlayerEvent
+	(*StartGameEvent)(nil),         // 9: break_bricks.protoc.StartGameEvent
 }
 var file_client_proto_depIdxs = []int32{
-	3, // 0: break_bricks.protoc.ClientSendMsg.createRoomEvent:type_name -> break_bricks.protoc.CreateRoomEvent
-	4, // 1: break_bricks.protoc.ClientSendMsg.joinRoomEvent:type_name -> break_bricks.protoc.JoinRoomEvent
-	5, // 2: break_bricks.protoc.ClientSendMsg.leaveRoomEvent:type_name -> break_bricks.protoc.LeaveRoomEvent
-	6, // 3: break_bricks.protoc.ClientSendMsg.readyEvent:type_name -> break_bricks.protoc.ReadyEvent
-	0, // 4: break_bricks.protoc.ClientAcceptMsg.code:type_name -> break_bricks.protoc.ClientAcceptMsg.Code
-	3, // 5: break_bricks.protoc.ClientAcceptMsg.createRoomEvent:type_name -> break_bricks.protoc.CreateRoomEvent
-	7, // 6: break_bricks.protoc.ClientAcceptMsg.refreshRoomPlayerEvent:type_name -> break_bricks.protoc.RefreshRoomPlayerEvent
-	8, // 7: break_bricks.protoc.ClientAcceptMsg.startGameEvent:type_name -> break_bricks.protoc.StartGameEvent
-	9, // 8: break_bricks.protoc.ClientAcceptMsg.pingEvent:type_name -> break_bricks.protoc.PingEvent
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	3,  // 0: break_bricks.protoc.ClientSendMsg.createRoomEvent:type_name -> break_bricks.protoc.CreateRoomEvent
+	4,  // 1: break_bricks.protoc.ClientSendMsg.joinRoomEvent:type_name -> break_bricks.protoc.JoinRoomEvent
+	5,  // 2: break_bricks.protoc.ClientSendMsg.leaveRoomEvent:type_name -> break_bricks.protoc.LeaveRoomEvent
+	6,  // 3: break_bricks.protoc.ClientSendMsg.readyEvent:type_name -> break_bricks.protoc.ReadyEvent
+	7,  // 4: break_bricks.protoc.ClientSendMsg.pingEvent:type_name -> break_bricks.protoc.PingEvent
+	0,  // 5: break_bricks.protoc.ClientAcceptMsg.code:type_name -> break_bricks.protoc.ClientAcceptMsg.Code
+	3,  // 6: break_bricks.protoc.ClientAcceptMsg.createRoomEvent:type_name -> break_bricks.protoc.CreateRoomEvent
+	8,  // 7: break_bricks.protoc.ClientAcceptMsg.refreshRoomPlayerEvent:type_name -> break_bricks.protoc.RefreshRoomPlayerEvent
+	9,  // 8: break_bricks.protoc.ClientAcceptMsg.startGameEvent:type_name -> break_bricks.protoc.StartGameEvent
+	7,  // 9: break_bricks.protoc.ClientAcceptMsg.pingEvent:type_name -> break_bricks.protoc.PingEvent
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_client_proto_init() }
@@ -449,6 +474,7 @@ func file_client_proto_init() {
 		(*ClientSendMsg_JoinRoomEvent)(nil),
 		(*ClientSendMsg_LeaveRoomEvent)(nil),
 		(*ClientSendMsg_ReadyEvent)(nil),
+		(*ClientSendMsg_PingEvent)(nil),
 	}
 	file_client_proto_msgTypes[1].OneofWrappers = []interface{}{
 		(*ClientAcceptMsg_CreateRoomEvent)(nil),

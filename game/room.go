@@ -19,16 +19,6 @@ const (
 	Game = Full + 1
 )
 
-//连接的玩家
-type Player struct {
-	udpAddr *net.UDPAddr
-	ready   bool //是否已经准备
-}
-
-func NewPlayer(udpAddr *net.UDPAddr) *Player {
-	return &Player{udpAddr: udpAddr}
-}
-
 //房间
 type Room struct {
 	id           string                       //房间的唯一标识
@@ -41,7 +31,8 @@ type Room struct {
 	leave        chan *Player                 //用户离开房间，无缓冲，一个一个离开
 	ready        chan *Player                 //用户准备事件
 	broadcast    chan *protoc.ClientAcceptMsg //广播消息,有缓冲
-	heartbeat    <-chan time.Time             //心跳检测
+	ping         <-chan time.Time             //ping
+	checkActivePlayer chan *Player            //
 }
 
 //创建一个房间
@@ -57,7 +48,7 @@ func NewRoom(id string, conn *net.UDPConn) *Room {
 		leave:        make(chan *Player),
 		ready:        make(chan *Player),
 		broadcast:    make(chan *protoc.ClientAcceptMsg, 20),
-		heartbeat:    time.Tick(15 * time.Second),
+		ping:         time.Tick(AliveInterval / 2 * time.Second),
 	}
 }
 
@@ -85,14 +76,23 @@ func (g *Room) GetPlayers() []*protoc.Player {
 	players := make([]*protoc.Player, len(g.PlayerMap))
 
 	i := 0
-	for udpString, _ := range g.PlayerMap {
+	for _, item := range g.PlayerMap {
 		player := new(protoc.Player)
-		player.UdpString = udpString
+		player.UdpString = item.udpAddr.String()
+		player.Ready = item.ready
+		player.LastAcceptPingTime = item.lastAcceptPingTime
 		players[i] = player
 		i++
 	}
-
 	return players
+}
+
+//服务端主动广播一个刷新房间用户信息的事件
+func (g *Room) broadcastRefreshRoomPlayerEvent() {
+	refreshRoomPlayerEventBroadcast := new(protoc.ClientAcceptMsg)
+	refreshRoomPlayerEventBroadcast.Code = protoc.ClientAcceptMsg_Success
+	refreshRoomPlayerEventBroadcast.Event = &protoc.ClientAcceptMsg_RefreshRoomPlayerEvent{RefreshRoomPlayerEvent: &protoc.RefreshRoomPlayerEvent{Players: g.GetPlayers()}}
+	g.GetBroadcastChan() <- refreshRoomPlayerEventBroadcast
 }
 
 //运行房间
@@ -110,11 +110,7 @@ func (g *Room) Run() {
 				}
 
 				//服务端主动广播一个刷新房间用户的事件
-				refreshRoomPlayerEventBroadcast := new(protoc.ClientAcceptMsg)
-				refreshRoomPlayerEventBroadcast.Code = protoc.ClientAcceptMsg_Success
-				refreshRoomPlayerEventBroadcast.Event = &protoc.ClientAcceptMsg_RefreshRoomPlayerEvent{RefreshRoomPlayerEvent: &protoc.RefreshRoomPlayerEvent{Players: g.GetPlayers()}}
-
-				g.GetBroadcastChan() <- refreshRoomPlayerEventBroadcast
+				g.broadcastRefreshRoomPlayerEvent()
 			}
 		case leave := <-g.leave:
 			//用户离开房间
@@ -128,12 +124,8 @@ func (g *Room) Run() {
 				}
 
 				if g.status == Prepare {
-					//如果房间是等待状态的
 					//服务端主动广播一个刷新房间用户的事件
-					refreshRoomPlayerEvent := new(protoc.ClientAcceptMsg)
-					refreshRoomPlayerEvent.Code = protoc.ClientAcceptMsg_Success
-					refreshRoomPlayerEvent.Event = &protoc.ClientAcceptMsg_RefreshRoomPlayerEvent{RefreshRoomPlayerEvent: &protoc.RefreshRoomPlayerEvent{Players: g.GetPlayers()}}
-					g.GetBroadcastChan() <- refreshRoomPlayerEvent
+					g.broadcastRefreshRoomPlayerEvent()
 				}
 			}
 
@@ -146,7 +138,11 @@ func (g *Room) Run() {
 			if player, ok := g.PlayerMap[ready.udpAddr.String()]; ok {
 				//变更用户的状态
 				player.ready = ready.ready
+				player.SetLastAcceptPingTime(time.Now().Unix())
 			}
+
+			//服务端主动广播一个刷新房间用户的事件
+			g.broadcastRefreshRoomPlayerEvent()
 
 			//是否开启游戏
 			isStartGame := true
@@ -182,12 +178,12 @@ func (g *Room) Run() {
 			//关闭房间
 			g.Close()
 			return
-		case <-g.heartbeat:
-			//心跳检测
-			refreshRoomPlayerEvent := new(protoc.ClientAcceptMsg)
-			refreshRoomPlayerEvent.Code = protoc.ClientAcceptMsg_Success
-			//refreshRoomPlayerEvent.Event = &protoc.ClientAcceptMsg_PingEvent{PingEvent: &protoc.PingEvent{Time}}
-			g.GetBroadcastChan() <-
+		case <-g.ping:
+			//15s发送一个ping给客户端
+			pingEvent := new(protoc.ClientAcceptMsg)
+			pingEvent.Code = protoc.ClientAcceptMsg_Success
+			pingEvent.Event = &protoc.ClientAcceptMsg_PingEvent{PingEvent: &protoc.PingEvent{Time: time.Now().Format("2006-01-02 15:04:05")}}
+			g.GetBroadcastChan() <- pingEvent
 		}
 	}
 }

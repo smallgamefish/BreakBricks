@@ -41,5 +41,6 @@ message StartGameEvent {
 
 //ping，心跳事件
 message PingEvent {
-  string time = 1;
+  string roomId = 1; //房间id
+  string time = 2;   //时间
 }

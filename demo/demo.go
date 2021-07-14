@@ -119,12 +119,16 @@ func joinRoom(roomId string) {
 			//刷新房间的事件
 			log.Println("房间用户刷新开始：")
 			for _, player := range event.RefreshRoomPlayerEvent.GetPlayers() {
-				log.Println(player.GetUdpString())
+				log.Println("玩家地址udp唯一标识", player.GetUdpString())
+				log.Println("玩家准备状态", player.GetReady())
 			}
 			log.Println("房间用户刷新完毕")
 		case *protoc.ClientAcceptMsg_StartGameEvent:
 			//监听游戏开始事件
 			log.Println("开始游戏：", event.StartGameEvent.GetName())
+		case *protoc.ClientAcceptMsg_PingEvent:
+			//心跳检测
+			log.Println("心跳检测：", event.PingEvent.Time)
 		}
 	}
 }
