@@ -12,10 +12,15 @@ pipeline {
                 sh 'sudo docker-compose down'
             }
         }
-        stage('docker容器启动') {
+        stage('docker里面编译golang应用') {
             steps {
-                sh 'sudo docker-compose up -d'
+                sh 'sudo docker-compose -f build-docker-compose.yml up'
             }
+        }
+        stage('docker里面运行golang应用') {
+                    steps {
+                        sh 'sudo docker-compose -f run-docker-compose.yml up -d'
+                    }
         }
     }
 }

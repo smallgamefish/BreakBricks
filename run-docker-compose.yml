@@ -1,0 +1,18 @@
+version: '3.7'
+services:
+  break_bricks_run:
+    container_name: break_bricks_run
+    #指定构建的Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile
+      #工作目录空间
+    working_dir: /go/src/github.com/smallgamefish/BreakBricks
+    volumes:
+      - ./:/go/src/github.com/smallgamefish/BreakBricks
+    command: /bin/bash -c "/go/src/github.com/smallgamefish/BreakBricks/BreakBricks"
+    #设置环境变量
+    environment:
+      - GOPROXY=https://mirrors.aliyun.com/goproxy/
+    ports:
+      - "8100:8100"

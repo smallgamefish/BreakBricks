@@ -1,7 +1,7 @@
 version: '3.7'
 services:
-  break_bricks:
-    container_name: break_bricks
+  break_bricks_build:
+    container_name: break_bricks_build
     #指定构建的Dockerfile
     build:
       context: .
@@ -10,10 +10,9 @@ services:
     working_dir: /go/src/github.com/smallgamefish/BreakBricks
     volumes:
       - ./:/go/src/github.com/smallgamefish/BreakBricks
-    command: /bin/bash -c "go install -v ./ && /go/bin/BreakBricks"
+      #将pkg目录映射出来，公共
+      - /home/xiaoyouyu/lyGolangWorkingDir/golang-1.16.3/pkg:/go/pkg
+    command: /bin/bash -c "go mod download && go build -o BreakBricks main.go"
     #设置环境变量
     environment:
-      - GIN_MODE=release
       - GOPROXY=https://mirrors.aliyun.com/goproxy/
-    ports:
-      - "8084:8084"
