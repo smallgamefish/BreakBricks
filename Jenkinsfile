@@ -9,7 +9,7 @@ pipeline {
         }
         stage('停止docker容器') {
             steps {
-                sh 'sudo docker-compose down'
+                sh 'sudo docker-compose -f run-docker-compose.yml down'
             }
         }
         stage('docker里面编译golang应用') {
