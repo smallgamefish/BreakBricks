@@ -15,4 +15,4 @@ services:
     environment:
       - GOPROXY=https://mirrors.aliyun.com/goproxy/
     ports:
-      - "8100:8100"
+      - 8100:8100/udp
