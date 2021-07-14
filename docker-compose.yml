@@ -1,6 +1,3 @@
-#描点&和别名*,来实现公共变量
-
-
 version: '3.7'
 services:
   break_bricks:
