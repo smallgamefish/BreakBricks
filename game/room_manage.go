@@ -102,7 +102,7 @@ func(m *roomManage) UpdatePlayerLastAcceptPingTime(roomId string, player *net.UD
 	}
 
 	readyPlayer := NewPlayer(player)
-	room.getReadyChan() <- readyPlayer
+	room.getPingActivePlayerChan() <- readyPlayer
 	return nil
 }
 

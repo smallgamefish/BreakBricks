@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/golang/protobuf/proto"
+	"github.com/smallgamefish/BreakBricks/game"
 	"github.com/smallgamefish/BreakBricks/protoc/github.com/smallgamefish/BreakBricks/protoc"
 	"log"
 	"net"
@@ -83,7 +84,7 @@ func joinRoom(roomId string) {
 
 	tick := time.Tick(3 * time.Second)
 
-	//30s后发送准备事件
+	//3s后发送准备事件
 	go func() {
 		<-tick
 
@@ -98,6 +99,21 @@ func joinRoom(roomId string) {
 		}
 		log.Println("发送准备事件完毕")
 
+	}()
+
+	//发送心跳检测，让服务端知道你还活着
+	pingTick := time.Tick(game.AliveInterval / 2 * time.Second)
+	go func() {
+		for {
+			select {
+			case <-pingTick:
+				readyRequest := &protoc.ClientSendMsg{Event: &protoc.ClientSendMsg_PingEvent{
+					PingEvent: &protoc.PingEvent{RoomId: roomId},
+				}}
+				readyData, _ := proto.Marshal(readyRequest)
+				socket.Write(readyData)
+			}
+		}
 	}()
 
 	//接受数据
@@ -128,7 +144,7 @@ func joinRoom(roomId string) {
 			log.Println("开始游戏：", event.StartGameEvent.GetName())
 		case *protoc.ClientAcceptMsg_PingEvent:
 			//心跳检测
-			log.Println("心跳检测：", event.PingEvent.RoomId)
+			log.Println("接收到服务端推送过来的心跳检测：", event.PingEvent.RoomId)
 		}
 	}
 }

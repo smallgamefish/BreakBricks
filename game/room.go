@@ -3,6 +3,7 @@ package game
 import (
 	"github.com/golang/protobuf/proto"
 	"github.com/smallgamefish/BreakBricks/protoc/github.com/smallgamefish/BreakBricks/protoc"
+	"log"
 	"net"
 	"time"
 )
@@ -27,7 +28,7 @@ type Room struct {
 	conn              *net.UDPConn                 //udp服务器的唯一链接
 	PlayerMap         map[string]*Player           //加入房间的client,key是udp唯一标识
 	join              chan *Player                 //用户加入房间,  无缓冲，一个一个进入
-	leave             chan *Player                 //用户离开房间，无缓冲，一个一个离开
+	leave             chan *Player                 //用户离开房间，有缓冲
 	ready             chan *Player                 //用户准备事件
 	broadcast         chan *protoc.ClientAcceptMsg //广播消息,有缓冲
 	ping              <-chan time.Time             //ping,发送给客户端的ping
@@ -44,7 +45,7 @@ func NewRoom(id string, conn *net.UDPConn) *Room {
 		conn:              conn,
 		PlayerMap:         make(map[string]*Player),
 		join:              make(chan *Player),
-		leave:             make(chan *Player),
+		leave:             make(chan *Player,20),
 		ready:             make(chan *Player),
 		broadcast:         make(chan *protoc.ClientAcceptMsg, 20),
 		ping:              time.Tick(AliveInterval / 2 * time.Second),
@@ -220,9 +221,11 @@ func (g *Room) Close() {
 		recover()
 	}()
 
+	RoomManage.deleteRoom(g.id)
 	g.PlayerMap = nil
 	close(g.join)
 	close(g.broadcast)
 
-	RoomManage.deleteRoom(g.id)
+	log.Println("roomId", g.id, "房间资源已经释放")
+
 }
