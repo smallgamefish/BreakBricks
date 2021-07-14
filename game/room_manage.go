@@ -61,7 +61,7 @@ func (m *roomManage) JoinRoom(roomId string, player *net.UDPAddr) error {
 	}
 
 	//加入房间
-	room.GetJoinChan() <- NewPlayer(player)
+	room.getJoinChan() <- NewPlayer(player)
 
 	return nil
 }
@@ -74,7 +74,7 @@ func (m *roomManage) LeaveRoom(roomId string, player *net.UDPAddr) error {
 		return err
 	}
 
-	room.GetLeaveChan() <- NewPlayer(player)
+	room.getLeaveChan() <- NewPlayer(player)
 
 	return nil
 }
@@ -91,6 +91,18 @@ func (m *roomManage) ReadyRoom(roomId string, player *net.UDPAddr, ready bool) e
 
 	room.getReadyChan() <- readyPlayer
 
+	return nil
+}
+
+//ping一下用户，确保用户还链接正常
+func(m *roomManage) UpdatePlayerLastAcceptPingTime(roomId string, player *net.UDPAddr) error{
+	room, err := m.GetRoom(roomId)
+	if err != nil {
+		return err
+	}
+
+	readyPlayer := NewPlayer(player)
+	room.getReadyChan() <- readyPlayer
 	return nil
 }
 

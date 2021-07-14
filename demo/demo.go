@@ -128,7 +128,7 @@ func joinRoom(roomId string) {
 			log.Println("开始游戏：", event.StartGameEvent.GetName())
 		case *protoc.ClientAcceptMsg_PingEvent:
 			//心跳检测
-			log.Println("心跳检测：", event.PingEvent.Time)
+			log.Println("心跳检测：", event.PingEvent.RoomId)
 		}
 	}
 }

@@ -95,7 +95,8 @@ func main() {
 			log.Println("用户在房间内准备:", err)
 		case *protoc.ClientSendMsg_PingEvent:
 			//客户端要定时发送ping给服务端，否则，服务器会认为这个用户已经断开了链接，会释放资源
-
+			err = roomManage.UpdatePlayerLastAcceptPingTime(event.PingEvent.GetRoomId(), remoteAddr)
+			log.Println("ping用户，确保用户链接还活着:", err)
 		}
 
 	}
