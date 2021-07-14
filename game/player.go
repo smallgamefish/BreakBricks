@@ -7,7 +7,7 @@ import (
 
 const (
 	//30s内判断用户是否活着
-	AliveInterval = 10
+	AliveInterval = 30
 )
 
 //连接的玩家
