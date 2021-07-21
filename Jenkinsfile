@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('拉取代码') {
             steps {
-               checkout([$class: 'GitSCM', branches: [[name: "*/${branch}"]], extensions: [], userRemoteConfigs: [[credentialsId: 'e8652a60-e738-456c-9117-6c8ce691acff', url: 'git@github.com:smallgamefish/BreakBricks.git']]])
+               checkout([$class: 'GitSCM', branches: [[name: "*/${branch}"]], extensions: [], userRemoteConfigs: [[credentialsId: '05bad6fc-2115-4e94-a96d-e7f020f2a7fa', url: 'git@github.com:smallgamefish/BreakBricks.git']]])
             }
         }
         stage('停止应用容器') {
