@@ -64,6 +64,7 @@ func main() {
 		switch event := msg.Event.(type) {
 
 		case *protoc.ClientSendMsg_CreateRoomEvent:
+			log.Println("创建房间")
 			//创建房间的事件
 			err = roomManage.AddRoom(event.CreateRoomEvent.GetRoomId())
 
