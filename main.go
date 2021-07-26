@@ -51,6 +51,7 @@ func main() {
 		err = proto.Unmarshal(data[:n], msg)
 		if err != nil {
 			//解码失败
+			log.Println("数据解码失败: ",err)
 			response := new(protoc.ClientAcceptMsg)
 			response.Code = protoc.ClientAcceptMsg_Error
 			response.Error = err.Error()
