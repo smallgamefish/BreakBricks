@@ -18,6 +18,8 @@ message ClientSendMsg {
     //如果服务器15秒内没有收到心跳检测，则代表用户断开了链接，服务器会释放用户的资源
     //如果房间内的所有用户都断开，则释放房间资源
     PingEvent pingEvent = 5;
+    //游戏数据帧数据
+    FrameDataEvent frameDataEvent = 6;
   }
 }
 
@@ -40,5 +42,7 @@ message ClientAcceptMsg{
     //如果服务器15秒内没有收到心跳检测，则代表用户断开了链接，服务器会释放用户的资源
     //如果房间内的所有用户都断开，则释放房间资源
     PingEvent pingEvent = 6;
+    //游戏数据帧数据
+    FrameDataEvent frameDataEvent = 7;
   }
 }

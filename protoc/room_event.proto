@@ -43,3 +43,10 @@ message StartGameEvent {
 message PingEvent {
   string roomId = 1; //房间id
 }
+
+//针数据
+message FrameDataEvent{
+  string roomId = 1;
+  //游戏的数据帧数据
+  bytes frameData = 2;
+}

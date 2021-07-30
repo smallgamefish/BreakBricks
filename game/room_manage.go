@@ -3,6 +3,7 @@ package game
 import (
 	"errors"
 	"fmt"
+	"github.com/smallgamefish/BreakBricks/protoc/github.com/smallgamefish/BreakBricks/protoc"
 	"net"
 	"sync"
 )
@@ -79,6 +80,22 @@ func (m *roomManage) LeaveRoom(roomId string, player *net.UDPAddr) error {
 	return nil
 }
 
+//游戏数据帧广播
+func (m *roomManage) BroadcastFrameData(event *protoc.ClientSendMsg_FrameDataEvent) error {
+	room, err := m.GetRoom(event.FrameDataEvent.GetRoomId())
+	if err != nil {
+		return err
+	}
+
+	startGameEvent := new(protoc.ClientAcceptMsg)
+	startGameEvent.Code = protoc.ClientAcceptMsg_Success
+	startGameEvent.Event = &protoc.ClientAcceptMsg_FrameDataEvent{FrameDataEvent: &protoc.FrameDataEvent{FrameData: event.FrameDataEvent.GetFrameData(), RoomId: event.FrameDataEvent.GetRoomId()}}
+
+	room.getBroadcastChan() <- startGameEvent
+
+	return nil
+}
+
 //用户准备
 func (m *roomManage) ReadyRoom(roomId string, player *net.UDPAddr, ready bool) error {
 	room, err := m.GetRoom(roomId)
@@ -95,7 +112,7 @@ func (m *roomManage) ReadyRoom(roomId string, player *net.UDPAddr, ready bool) e
 }
 
 //ping一下用户，确保用户还链接正常
-func(m *roomManage) UpdatePlayerLastAcceptPingTime(roomId string, player *net.UDPAddr) error{
+func (m *roomManage) UpdatePlayerLastAcceptPingTime(roomId string, player *net.UDPAddr) error {
 	room, err := m.GetRoom(roomId)
 	if err != nil {
 		return err

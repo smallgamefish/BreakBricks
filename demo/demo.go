@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/golang/protobuf/proto"
 	"github.com/smallgamefish/BreakBricks/game"
 	"github.com/smallgamefish/BreakBricks/protoc/github.com/smallgamefish/BreakBricks/protoc"
@@ -142,11 +143,37 @@ func joinRoom(roomId string) {
 		case *protoc.ClientAcceptMsg_StartGameEvent:
 			//监听游戏开始事件
 			log.Println("开始游戏：", event.StartGameEvent.GetName())
+
+			//触发发送数据帧
+			frameDataSend(roomId, socket)
+
 		case *protoc.ClientAcceptMsg_PingEvent:
 			//心跳检测
 			log.Println("接收到服务端推送过来的心跳检测：", event.PingEvent.RoomId)
+		case *protoc.ClientAcceptMsg_FrameDataEvent:
+			log.Println("收到数据帧", string(event.FrameDataEvent.GetFrameData()))
 		}
 	}
+}
+
+func frameDataSend(roomId string, socket *net.UDPConn) {
+
+	tick := time.Tick(time.Second)
+	go func() {
+		i := 0
+		for {
+			select {
+			case <-tick:
+
+				readyRequest := &protoc.ClientSendMsg{Event: &protoc.ClientSendMsg_FrameDataEvent{
+					FrameDataEvent: &protoc.FrameDataEvent{RoomId: roomId, FrameData: []byte(fmt.Sprintf("我是%s用户，现在发送第%d个数据帧", socket.LocalAddr().String(), i))},
+				}}
+				readyData, _ := proto.Marshal(readyRequest)
+				socket.Write(readyData)
+				i++
+			}
+		}
+	}()
 }
 
 func main() {
